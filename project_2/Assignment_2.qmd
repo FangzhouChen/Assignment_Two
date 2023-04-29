@@ -1,0 +1,153 @@
+---
+title: "Assignment Two"
+author: "Fangzhou Chen"
+format: html
+execute: 
+  echo: false
+  warning: false
+  message: false
+---
+
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(ggplot2)
+library(maps)
+
+unicef_metadata <- read.csv("/cloud/project/unicef_metadata.csv")
+
+# Read in another data file
+unicef_indicator_2 <- read.csv("/cloud/project/unicef_indicator_2.csv")
+```
+
+
+# **My Assignment**
+
+## _Thank you professor_
+
+
+#### As a general overview, The chart to the right demonstrates the ranking of percentage of deliveries attended by skilled health personnel from low to high in almost 20 years. 
+  
+#### Many African and South Asian countries have very low ratio of skilled obstetricians to help with baby delivery. 
+
+
+```{r}
+library(ggplot2)
+
+# Read in the data
+unicef_indicator_2 <- read.csv("/cloud/project/unicef_indicator_2.csv")
+
+# Create the bar chart
+ggplot(unicef_indicator_2, aes(x = obs_value, y = reorder(country, -obs_value))) +
+  geom_bar(stat = "identity", fill = "steelblue", position = position_dodge(width = 0.8)) +
+  labs(title = "Ranking",
+       x = "Observed Value",
+       y = "Country") +
+  theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 3))
+
+
+```
+---
+
+#### Additionally, the chart to the right demostrates how GDP per capita related to life expectancy. However, simultaneously, those higher GDP per capita countries tend to have higher skilled obstetrician attendance rate as well. Some particular countries are mark since they are good examples of regional situations
+---
+
+
+```{r}
+unicef_metadata %>%
+  ggplot(aes(year, Population..total)) +
+  geom_point(color = "#FFBD59") +
+  theme(plot.background = element_rect(fill = "lightblue")) +
+  labs(title = "Average GDP per Capita") +
+  geom_smooth(method = "lm", se = FALSE)
+
+```
+---
+
+#### Additionally, the chart to the right demostrates that most of low skilled obstetrician attendance ratio countries are in Africa and South Asia
+---
+
+```{r}
+library(ggplot2)
+library(maps)
+library(dplyr)
+
+# Read in the data
+unicef_indicator_2 <- read.csv("/cloud/project/unicef_indicator_2.csv")
+
+# Map the countries
+world_map <- map_data("world")
+
+# Merge the data with the world map data
+map_data <- left_join(world_map, unicef_indicator_2, by = c("region" = "country"))
+
+# Create the map
+ggplot(map_data, aes(x = long, y = lat, group = group, fill = obs_value)) +
+  geom_polygon() +
+  scale_fill_gradient(low = "white", high = "#FFBD59") +
+  labs(title = "Distribution of Observed Value by Country",
+       fill = "Observed Value") +
+  theme(plot.title = element_text(size = 20),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        panel.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.position = "bottom")
+```
+---
+
+
+#### Some special cases worth noticing, Japan as the only developed countries in Asia has 99.9% through all the years. China, as one of the biggest growing economic systems, has reached very high level in the recent years 
+  
+#### However, Bolivia had a rapid growth in the ratio of skilled obstetricians attendance before 2016, and started to decline for some reason. 
+  
+#### Afghanistan, started a rapid growth in 2014, the year NATO withdrew their military force. The assumption is, when war subsides, the focus of medical force shifted their directions 
+  
+#### Most African countries have around 50% ratio of skilled obstetricians’ attendance rate. For example, Congo, a Central African country does not have consistent record through out year. This could be a sign of lack of enough medical support from time to time. 
+---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Read in the data
+unicef_indicator_2 <- read.csv("/cloud/project/unicef_indicator_2.csv")
+
+# Filter the data to the specified countries
+countries <- c("Afghanistan", "Austria", "Bolivia", "Chile", "China", "Congo", "Ethiopia", "Fiji", "India", "Japan", "Pakistan")
+filtered_data <- unicef_indicator_2 %>% 
+  filter(country %in% countries)
+
+# Group the data by time period and calculate the average obs_value
+grouped_data <- filtered_data %>% 
+  group_by(time_period, country) %>% 
+  summarize(avg_obs_value = mean(obs_value))
+
+# Create the line chart
+ggplot(grouped_data, aes(x = time_period, y = avg_obs_value, color = country)) +
+  geom_line() +
+  labs(title = "Average Observed Value by Time Period",
+       x = "Time Period",
+       y = "Average Observed Value",
+       color = "Country") +
+  scale_color_manual(values = c("Afghanistan" = "red", "Austria" = "blue", "Bolivia" = "green", "Chile" = "orange", "China" = "purple", "Congo" = "brown", "Ethiopia" = "gray", "Fiji" = "darkgreen", "India" = "pink", "Japan" = "gold", "Pakistan" = "black")) +
+  theme(plot.title = element_text(size = 20),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        legend.position = "bottom")
+
+```
+---
+
+### Conclusion
+
+#### In many African and South Asian countries, there is a shortage of skilled obstetricians, with a ratio of less than 50% attendance rate with skilled obstetricians. Besides, potential high risk for baby delivery, those countries suffers from multiple crisis at the moment and are probably can not focus on prior this problem. Urgent support from international community is needed.  Add specific  stuff
+
+
+
+
